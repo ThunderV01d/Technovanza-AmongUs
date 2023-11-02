@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/Technovanza-AmongUs/static/css/main.cb24ed6d.css",
-    "main.js": "/Technovanza-AmongUs/static/js/main.56da383b.js",
+    "main.css": "/Technovanza-AmongUs/static/css/main.52ae7302.css",
+    "main.js": "/Technovanza-AmongUs/static/js/main.3234a0cb.js",
     "static/js/787.b0e29ad6.chunk.js": "/Technovanza-AmongUs/static/js/787.b0e29ad6.chunk.js",
     "static/media/logo.svg": "/Technovanza-AmongUs/static/media/logo.0eae893d0c2fdf158a5f67a92980b238.svg",
     "index.html": "/Technovanza-AmongUs/index.html",
-    "main.cb24ed6d.css.map": "/Technovanza-AmongUs/static/css/main.cb24ed6d.css.map",
-    "main.56da383b.js.map": "/Technovanza-AmongUs/static/js/main.56da383b.js.map",
+    "main.52ae7302.css.map": "/Technovanza-AmongUs/static/css/main.52ae7302.css.map",
+    "main.3234a0cb.js.map": "/Technovanza-AmongUs/static/js/main.3234a0cb.js.map",
     "787.b0e29ad6.chunk.js.map": "/Technovanza-AmongUs/static/js/787.b0e29ad6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.cb24ed6d.css",
-    "static/js/main.56da383b.js"
+    "static/css/main.52ae7302.css",
+    "static/js/main.3234a0cb.js"
   ]
 }
