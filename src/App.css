@@ -50,3 +50,7 @@ input[type=submit]:hover {
   border:5px solid rgb(0, 24, 52);
   color:''
 }
+
+::placeholder {
+  color: rgb(83, 83, 83);
+}
