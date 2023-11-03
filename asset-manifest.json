@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/Technovanza-AmongUs/static/css/main.5c585571.css",
+    "main.css": "/Technovanza-AmongUs/static/css/main.43c2d143.css",
     "main.js": "/Technovanza-AmongUs/static/js/main.587d0a92.js",
     "static/js/787.b0e29ad6.chunk.js": "/Technovanza-AmongUs/static/js/787.b0e29ad6.chunk.js",
     "static/media/logo.svg": "/Technovanza-AmongUs/static/media/logo.9eb1e1f375148feaba1280448ef28cd7.svg",
     "index.html": "/Technovanza-AmongUs/index.html",
-    "main.5c585571.css.map": "/Technovanza-AmongUs/static/css/main.5c585571.css.map",
+    "main.43c2d143.css.map": "/Technovanza-AmongUs/static/css/main.43c2d143.css.map",
     "main.587d0a92.js.map": "/Technovanza-AmongUs/static/js/main.587d0a92.js.map",
     "787.b0e29ad6.chunk.js.map": "/Technovanza-AmongUs/static/js/787.b0e29ad6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5c585571.css",
+    "static/css/main.43c2d143.css",
     "static/js/main.587d0a92.js"
   ]
 }
