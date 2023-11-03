@@ -2,6 +2,9 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  };
   return (
     <div className="App">
       <header className="App-header">
@@ -17,7 +20,14 @@ function App() {
         >
           Learn React
         </a> */}
-      <p>STAY TUNED FOR MORE...</p>
+      <br />
+      <form onSubmit={handleSubmit} class='form'>
+        <label for='uname'>Enter a username: </label>
+        <br />
+        <input type='text' id='uname' name='uname' />
+        <br />
+        <input type='submit' value='PLAY'/>
+      </form>
       </header>
     </div>
   );
