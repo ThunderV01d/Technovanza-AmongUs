@@ -24,7 +24,7 @@ function App() {
       <form onSubmit={handleSubmit} class='form'>
         <label for='uname'>Enter a username: </label>
         <br />
-        <input type='text' id='uname' name='uname' />
+        <input type='text' id='uname' name='uname' placeholder='NoobMaster69'/>
         <br />
         <input type='submit' value='PLAY'/>
       </form>
