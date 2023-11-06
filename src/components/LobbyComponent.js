@@ -36,6 +36,7 @@
             filter: false
         });
         const [tableData, setTableData] = useState([]);
+        const [playerCount, setPlayerCount] = useState(0);
         const navigate = useNavigate();
 
         const changePlayerCount = (players) => {
