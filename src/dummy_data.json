@@ -1,12 +1,10 @@
-{
-    "players":[
-        {
-            "username":"ThunderVoid",
-            "color":"BLUE"
-        },
-        {
-            "username":"Shreeshman",
-            "color":"RED"
-        }
-    ]
-}
+[
+    {
+        "username":"ThunderVoid",
+        "color":"BLUE"
+    },
+    {
+        "username":"Shreeshman",
+        "color":"RED"
+    }
+]

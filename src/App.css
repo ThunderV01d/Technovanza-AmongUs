@@ -93,3 +93,9 @@ td{
 table tr:nth-child(odd){
   background:rgb(161, 120, 16);
 }
+
+.error-message{
+  font-size: 75%;
+  margin-top: 0px;
+  color:rgba(255, 0, 0, 0.464);
+}
