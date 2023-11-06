@@ -38,6 +38,10 @@
         const [tableData, setTableData] = useState([]);
         const navigate = useNavigate();
 
+        const changePlayerCount = (players) => {
+            setPlayerCount(Object.keys(players).length);
+        };
+
         useEffect(() => {
             if(lastJsonMessage){
                 console.log("Client lobby: ",lastJsonMessage);
