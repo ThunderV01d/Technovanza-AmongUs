@@ -28,7 +28,7 @@
     // }
 
     function Lobby(){
-        const { lastJsonMessage } = useWebSocket(wsurl, {
+        const { lastJsonMessage,sendJsonMessage } = useWebSocket(wsurl, {
             onOpen: () => {
                 console.log('Lobby: WebSocket connection established.');
             },
@@ -37,18 +37,28 @@
         });
         const [tableData, setTableData] = useState([]);
         const [playerCount, setPlayerCount] = useState(0);
+        const [maxPlayers, setMaxPlayers] = useState(0);
         const navigate = useNavigate();
-
         const changePlayerCount = (players) => {
             setPlayerCount(Object.keys(players).length);
         };
 
+        useEffect(() => {
+            // Send a request for the variable from the server when the component mounts
+            sendJsonMessage({
+              type: 'checkMaxPlayers' // Define an appropriate message type
+            });
+          }, [sendJsonMessage]); // Remove sendJsonMessage from the dependency array
+          
         useEffect(() => {
             if(lastJsonMessage){
                 console.log("Client lobby: ",lastJsonMessage);
                 if (lastJsonMessage.type==='playerEvent') {
                     setTableData(lastJsonMessage.data.players);
                     changePlayerCount(lastJsonMessage.data.players);
+                }
+                else if(lastJsonMessage==='checkMaxPlayers'){
+                    setMaxPlayers(lastJsonMessage.data);
                 }
             }
         }, [lastJsonMessage]);
@@ -57,7 +67,7 @@
                 <img src={logo} className="App-logo-small" alt="logo" />
                 <br />
                 <div id='table-body'>
-                    <p>Number of Players: {playerCount}</p>
+                    <p>Number of Players: {playerCount}/{maxPlayers}</p>
                     <table className='table'>
                         <thead>
                             <tr>

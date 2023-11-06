@@ -14,7 +14,6 @@ const wsurl = 'ws://127.0.0.1:8000';
 
 function App() {
   const [username, setUsername] = useState('');
-  const [gameStarted, setGameStarted] = useState(false);
   const { sendJsonMessage, readyState} = useWebSocket(wsurl, {
     onOpen: () => {
       console.log('App: WebSocket connection established.');
@@ -23,15 +22,6 @@ function App() {
     filter: () => false,
     retryOnError: true,
     shouldReconnect: () => true,
-    onMessage: (message) => {
-      console.log("client login recieved:", message);
-      const data = JSON.parse(message.data);
-      if (data.type==='startsignal'){
-          console.log("client: recieved signal message")
-          setGameStarted(data.data);
-          console.log("Client: set game to started state");
-      }
-    }
   });
 
   useEffect(() => {
@@ -46,7 +36,7 @@ function App() {
   return (
     <BrowserRouter>
         <Routes>
-        <Route path='/play' element={<Login onLogin={setUsername} gameStarted={setGameStarted}/>}/>
+        <Route path='/play' element={<Login onLogin={setUsername}/>}/>
         <Route path='/Technovanza-AmongUs' element={<Navigate to ="/play" />} />
         <Route path='' element={<Navigate to ="/play" />} />
         <Route path='/waiting' element={<Lobby  />}/>
