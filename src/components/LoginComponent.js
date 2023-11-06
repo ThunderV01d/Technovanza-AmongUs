@@ -4,49 +4,58 @@ import {useNavigate} from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import {wsurl} from '../App.js'
 
-function Login({onLogin}){
+function Login({onLogin,setGameStarted}){
     const [username, setUsername] = useState('');
-    const [gameStarted, setGameStarted] = useState(false);
-    const { lastJsonMessage ,sendJsonMessage} = useWebSocket(wsurl,{
+    const {sendJsonMessage} = useWebSocket(wsurl,{
         onOpen: () => {
             console.log('Login: WebSocket connection established.');
         },
         share:true,
-        filter:false
+        filter:false,
+        onMessage: (message) => {
+            const data = JSON.parse(message.data);
+            if (data.type === 'startsignal') {
+              console.log('Client: received signal message');
+              if (data.data) {
+                // Game has started, you can add your logic here
+                console.log('Game has started. Handle this case as needed.');
+              } else {
+                // Game has not started, you can proceed to the waiting page
+                onLogin && onLogin(username);
+                navigate('/waiting');
+              }
+            }
+          }
     });
+    // useEffect(() =>{
+    //     const error_msg = document.getElementsByClassName('error-message')[0];
+    //     if(submissionValid){
+    //         if(gameStarted){
+    //             error_msg.innerHTML = "The game has already started! Please wait";
+    //         }
+    //         else{
+    //             onLogin && onLogin(username);
+    //             navigate('/waiting');
+    //         }
+    //     }
+    //     else{
+    //         error_msg.innerHTML = "Please enter a valid username!";
+    //     }
+    // },[gameStarted]);
     //add code to request server if game has started ie:- gameStarted variable from server
+    
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if(lastJsonMessage){
-            console.log("Client login: ",lastJsonMessage);
-            if (lastJsonMessage.type==='startsignal'){
-                console.log("client: recieved signal message")
-                setGameStarted(lastJsonMessage.data);
-                console.log("Client: set game to started state");
-            }
-        }
-    }, [lastJsonMessage]);
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        const error_msg = document.getElementsByClassName('error-message')[0];
+        if(!username.trim()) {
+            error_msg.innerHTML = "Please enter a valid username!";            
+            return;
+        }
         sendJsonMessage({
-            type: "checkGameStarted",
-        });
-        console.log("client: check message sent")
-        if(gameStarted){
-            const error_msg = document.getElementsByClassName('error-message');
-            error_msg[0].innerHTML = "The game has already started! Please wait";
-        }
-        else if(!username.trim()) {
-            const error_msg = document.getElementsByClassName('error-message');
-            error_msg[0].innerHTML = "Please enter a valid username!";
-        }
-        else{
-            const error_msg = document.getElementsByClassName('error-message');
-            error_msg[0].innerHTML = "";
-            onLogin && onLogin(username);
-            navigate('/waiting');
-        }
+            type: 'checkGameStarted',
+        })
     };
     return(
         <div className="Login">

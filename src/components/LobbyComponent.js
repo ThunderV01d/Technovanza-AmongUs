@@ -36,17 +36,19 @@
             filter: false
         });
         const [tableData, setTableData] = useState([]);
+        const [playerCount, setPlayerCount] = useState(0);
         const navigate = useNavigate();
+
+        const changePlayerCount = (players) => {
+            setPlayerCount(Object.keys(players).length);
+        };
 
         useEffect(() => {
             if(lastJsonMessage){
                 console.log("Client lobby: ",lastJsonMessage);
-                if (lastJsonMessage.type==='playerevent') {
+                if (lastJsonMessage.type==='playerEvent') {
                     setTableData(lastJsonMessage.data.players);
                     changePlayerCount(lastJsonMessage.data.players);
-                }
-                else if (lastJsonMessage.type==='startsignal'){
-
                 }
             }
         }, [lastJsonMessage]);
@@ -55,6 +57,7 @@
                 <img src={logo} className="App-logo-small" alt="logo" />
                 <br />
                 <div id='table-body'>
+                    <p>Number of Players: {playerCount}</p>
                     <table className='table'>
                         <thead>
                             <tr>
