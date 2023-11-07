@@ -25,7 +25,7 @@
   align-items: center;
   justify-content: center;
   font-size: calc(25px + 1vmin);
-  font-family:"Comic Sans MS", cursive;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
   color: rgb(172, 157, 157);
   overflow-y:auto;
 }
@@ -43,7 +43,7 @@ input[type=submit]{
   width: calc(120px + 2vmin);
   height: calc(30px + 2vmin);
   font-size: calc(23px + 1vmin);
-  font-family:"Comic Sans MS", cursive;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
   border-radius: 25px;
   background-color:#6495ed;
   border:5px solid rgb(0, 63, 139);
