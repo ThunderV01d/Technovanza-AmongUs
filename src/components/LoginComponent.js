@@ -17,14 +17,13 @@ function Login({onLogin}){
     useEffect(() => {
         const error_msg = document.getElementsByClassName('error-message')[0];
         if (lastJsonMessage) {
-          console.log("Login Page received: ", lastJsonMessage);
           if (lastJsonMessage.type === 'checkGameStarted') {
             console.log("Game STARTED: ", lastJsonMessage.data);
             setGameStarted(lastJsonMessage.data);
             
             // Handle the logic here after receiving the server response
             if (lastJsonMessage.data) {
-              error_msg.innerHTML = "The game has already started! Please wait";
+              error_msg.innerHTML = "Lobby is full! Please join later.";
             } else {
               onLogin && onLogin(username);
               navigate('/waiting');
@@ -32,8 +31,6 @@ function Login({onLogin}){
           }
         }
       }, [lastJsonMessage]);
-      
-    // add code to request server if game has started ie:- gameStarted variable from server
     
     const navigate = useNavigate();
 
@@ -45,7 +42,7 @@ function Login({onLogin}){
           return;
         }
         sendJsonMessage({
-          type: 'checkGameStarted',
+          type: 'checkGameStarted'
         });
       };
       

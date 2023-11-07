@@ -11,10 +11,10 @@
 .App-logo-small{
   max-width: 50vw;
   height:20vmin;
-  
+  pointer-events: none;
 }
 
-.Login,.LobbyTable{
+.Login,.LobbyTable,.RoleReveal{
   background-color: #1a1c20;
   background-image: url("wallpaper.gif");
   background-blend-mode:hard-light;
@@ -26,7 +26,7 @@
   justify-content: center;
   font-size: calc(25px + 1vmin);
   /* font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; */
-  font-family: cursive;
+  font-family:'Courier New', Courier, monospace;
   color: rgb(172, 157, 157);
   overflow-y:auto;
 }
@@ -44,7 +44,7 @@ input[type=submit]{
   width: calc(120px + 2vmin);
   height: calc(30px + 2vmin);
   font-size: calc(23px + 1vmin);
-  font-family:cursive;
+  font-family:Geneva, Tahoma, sans-serif,Verdana;
   border-radius: 25px;
   background-color:#6495ed;
   border:5px solid rgb(0, 63, 139);
@@ -87,7 +87,7 @@ td{
 }
 
 #table-body{
-  font-size:2rem
+  font-size:calc(20px + 1vmin);
 }
 
 table tr:nth-child(odd){
@@ -98,4 +98,65 @@ table tr:nth-child(odd){
   font-size: 75%;
   margin-top: 0px;
   color:rgba(255, 0, 0, 0.464);
+}
+
+.number-of-players-message{
+  margin-bottom: 0px;
+  margin-top: 0px;
+  font-size: calc(10px + 1vmax);
+  text-align:start;
+  margin-left:calc(10px + 1vmin);
+}
+
+.waiting-message{
+  margin-bottom: 0px;
+  margin-top: 0px;
+  font-size: calc(10px + 1vmax);
+  text-align: end;
+  margin-right:calc(10px + 1vmin); 
+}
+
+.message-container {
+  display: flex;
+  justify-content: space-between; /* To place components at opposite ends */
+  align-items: center; /* To vertically align the components */
+}
+
+.RoleReveal {
+  /* Style for the RoleReveal container */
+  text-align: center;
+}
+
+.role-reveal-box {
+  /* Style for the rectangular component */
+  background-color: hsl(20, 83%, 57%); /* Background color */
+  padding: 20px; /* Padding for spacing */
+  border: 10px solid hsl(20, 63%, 36%); /* Border style */
+  border-top-left-radius: 15vmax; /* Rounded corners */
+  border-top-right-radius: 15vmax; /* Rounded corners */
+  display: inline-block; /* Keeps the content on the same line */
+  width: 25vmax;
+}
+
+#amongus-shh {
+  /* Style for the image */
+  max-width: 100%;
+  height: auto;
+}
+
+.top-text, .bottom-text {
+  /* Style for text on top and bottom of the image */
+  font-size: calc(10px + 5vmin);
+  color:darkred;
+  font-family:fantasy;
+}
+
+.bottom-text {
+  margin-top: 1vmin; /* Add spacing between top and bottom text */
+  margin-bottom: 1vmin;
+}
+
+.small-text {
+  /* Style for the small piece of text below the rectangular component */
+  font-size: 14px;
 }

@@ -4,29 +4,6 @@
     import useWebSocket from 'react-use-websocket';
     import {useNavigate} from 'react-router-dom';
 
-
-    // function addToTable(data){
-    //     document.getElementsByTagName('tbody').innerHTML= '';
-    //     var tr = document.createElement('tr');
-    //     var i=0
-    //     for (const key in data) {
-    //         tr.innerHTML='';
-    //         var td1 = document.createElement('td');
-    //         td1.innerHTML = i+1;
-    //         tr.appendChild(td1);
-    //         var td2 = document.createElement('td');
-    //         td2.innerHTML = data[key]['username'];
-    //         tr.appendChild(td2);
-    //         var td3 = document.createElement('td');
-    //         td3.innerHTML = data[key]['color'];
-    //         tr.appendChild(td3);
-    //         document.getElementsByTagName('tbody')[0].appendChild(tr);
-    //         console.log(tr);
-    //         tr = document.createElement('tr')
-    //         i++;
-    //     }
-    // }
-
     function Lobby(){
         const { lastJsonMessage,sendJsonMessage } = useWebSocket(wsurl, {
             onOpen: () => {
@@ -37,7 +14,8 @@
         });
         const [tableData, setTableData] = useState([]);
         const [playerCount, setPlayerCount] = useState(0);
-        const [maxPlayers, setMaxPlayers] = useState(0);
+        const [maxPlayers, setMaxPlayers] = useState(null);
+        const [gameStarted, setGameStarted]  = useState(false);
         const navigate = useNavigate();
         const changePlayerCount = (players) => {
             setPlayerCount(Object.keys(players).length);
@@ -56,9 +34,19 @@
                 if (lastJsonMessage.type==='playerEvent') {
                     setTableData(lastJsonMessage.data.players);
                     changePlayerCount(lastJsonMessage.data.players);
+                    sendJsonMessage({
+                        type: 'checkGameStarted'
+                    })
                 }
-                else if(lastJsonMessage==='checkMaxPlayers'){
+                else if(lastJsonMessage.type==='checkMaxPlayers'){
                     setMaxPlayers(lastJsonMessage.data);
+                }
+                else if (lastJsonMessage.type === 'checkGameStarted') {
+                    setGameStarted(lastJsonMessage.data);
+                    // Handle the logic here after receiving the server response
+                    if (lastJsonMessage.data) {
+                        navigate('/pregame');
+                    }
                 }
             }
         }, [lastJsonMessage]);
@@ -67,7 +55,10 @@
                 <img src={logo} className="App-logo-small" alt="logo" />
                 <br />
                 <div id='table-body'>
-                    <p>Number of Players: {playerCount}/{maxPlayers}</p>
+                    <div className='message-container'>
+                        <p className='number-of-players-message'>Number of Players: {playerCount}/{maxPlayers}</p>
+                        <p className='waiting-message'>Waiting for more players to join...</p>
+                    </div>
                     <table className='table'>
                         <thead>
                             <tr>
