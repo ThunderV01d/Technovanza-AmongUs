@@ -11,6 +11,8 @@ function RoleReveal(){
         share:true,
         filter:false,
     });
+    const navigate = useNavigate();
+
     //request sending
     useEffect(() => {
         sendJsonMessage({
@@ -29,9 +31,12 @@ function RoleReveal(){
             }
             else if (lastJsonMessage.type === 'requestTime') {
                 setTimer(lastJsonMessage.data);
+                if(timer===0){
+                    navigate('/game');
+                }
             }
         }
-    }, [lastJsonMessage,timer,role]);
+    }, [lastJsonMessage,timer,role,navigate]);
     //periodic request for time
     useEffect(() => {
         const timerInterval = setInterval(() => {
