@@ -6,7 +6,8 @@ import {wsurl} from '../App.js'
 
 function Login({onLogin}){
     const [username, setUsername] = useState('');
-    const [gameStarted,setGameStarted] = useState(false);
+    const navigate = useNavigate();
+
     const {sendJsonMessage,lastJsonMessage} = useWebSocket(wsurl,{
         onOpen: () => {
             console.log('Login: WebSocket connection established.');
@@ -18,9 +19,7 @@ function Login({onLogin}){
         const error_msg = document.getElementsByClassName('error-message')[0];
         if (lastJsonMessage) {
           if (lastJsonMessage.type === 'checkGameStarted') {
-            console.log("Game STARTED: ", lastJsonMessage.data);
-            setGameStarted(lastJsonMessage.data);
-            
+            console.log("Game STARTED: ", lastJsonMessage.data);            
             // Handle the logic here after receiving the server response
             if (lastJsonMessage.data) {
               error_msg.innerHTML = "Lobby is full! Please join later.";
@@ -30,10 +29,8 @@ function Login({onLogin}){
             }
           }
         }
-      }, [lastJsonMessage]);
+      }, [lastJsonMessage,navigate,onLogin,username]);
     
-    const navigate = useNavigate();
-
     const handleSubmit = (event) => {
         event.preventDefault();
         const error_msg = document.getElementsByClassName('error-message')[0];
@@ -44,6 +41,7 @@ function Login({onLogin}){
         sendJsonMessage({
           type: 'checkGameStarted'
         });
+        console.log("sent a check request!");
       };
       
     return(

@@ -53,7 +53,7 @@ function RoleReveal(){
         <div className="RoleReveal">
         <div className="role-reveal-box">
             <p className="top-text">Your role:</p>
-            <img src={shh} id="amongus-shh" />
+            <img src={shh} id="amongus-shh" alt=''/>
             <p className="bottom-text">{role}</p>
         </div>
         <p className="game-starting-in">Game starts in {timer}</p>

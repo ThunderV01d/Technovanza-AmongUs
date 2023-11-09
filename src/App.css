@@ -14,6 +14,20 @@
   pointer-events: none;
 }
 
+.Game{
+  background-color: #0b0b0c;
+  background-size: 100vmin;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(25px + 1vmin);
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  color: rgb(172, 157, 157);
+  overflow-y:auto;
+}
+
 .Login,.LobbyTable,.RoleReveal{
   background-color: #1a1c20;
   background-image: url("wallpaper.gif");
@@ -48,6 +62,7 @@ input[type=submit]{
   background-color:#6495ed;
   border:5px solid rgb(0, 63, 139);
   padding-bottom: 45px;
+  margin-top: calc(20px + 1vmin);
   transition:0.3s;
 }
 
@@ -95,7 +110,7 @@ table tr:nth-child(odd){
 
 .error-message{
   font-size: 75%;
-  margin-top: 0px;
+  margin-top: calc(5px + 1vmin);
   color:rgba(255, 0, 0, 0.464);
 }
 
@@ -158,4 +173,121 @@ table tr:nth-child(odd){
 .small-text {
   /* Style for the small piece of text below the rectangular component */
   font-size: 14px;
+}
+
+.game-timer{
+  position: absolute;
+  top: 0vh;
+  margin:10px;
+  color:white
+}
+
+.task-box{
+  background-color: rgb(222, 222, 126);
+  color:#0b0b0c;
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 4.5vmin;
+  min-width: calc(10px+1vw);
+  position:absolute;
+  top: 8vh;
+  left:2vh;
+  right:2vh;
+  min-height: 40%;
+  max-height: 40%;
+  overflow-y:scroll;
+}
+
+#task-header{
+  text-align: center;
+  text-decoration: underline;
+  margin: 0px;
+}
+
+.task{
+  position: relative;
+}
+.task .disabled {
+  color: gray;
+  position:relative;
+}
+
+.checkbox-container {
+  margin-left: auto;
+}
+
+.checkbox-container input[type="checkbox"] {
+  display: none; /* Hide the default checkbox */
+}
+
+.checkbox-container input[type="checkbox"] + label {
+  position: relative;
+  padding-left: 30px; /* Adjust the padding as needed */
+  cursor: pointer;
+}
+
+.checkbox-container input[type="checkbox"] + label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px; /* Adjust the width */
+  height: 24px; /* Adjust the height */
+  border: 2px solid #000;
+  background-color: #fff;
+}
+
+.checkbox-container input[type="checkbox"]:checked + label::before {
+  content: '\2713'; /* Check mark character */
+  font-size: 20px; /* Adjust the font size */
+  line-height: 20px; /* Adjust the line height */
+  text-align: center;
+  color: #666666; /* Check mark color */
+}
+
+.task.disabled::before {
+  content: '';
+  position: absolute; /* Position the line absolutely within the relative parent */
+  top: 50%;
+  bottom: 0; /* Adjust as needed to place the line where you want */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #666666;
+}
+
+.task-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.task-list li {
+  margin-bottom: 10px;
+}
+
+
+.task-title {
+  font-weight: bold;
+  cursor: pointer;
+  display:flex;
+  align-items: center;
+}
+
+.arrow-bullet {
+  cursor: pointer;
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+
+.description {
+  display: none;
+  padding-left: 10px; /* Adjust as needed for spacing */
+  margin-top: 5px;
+}
+
+.task-list .expanded .description {
+  display: block;
 }

@@ -12,10 +12,10 @@
             share: true,
             filter: false
         });
+        const [timer,setTimer] = useState(3);
         const [tableData, setTableData] = useState([]);
         const [playerCount, setPlayerCount] = useState(0);
         const [maxPlayers, setMaxPlayers] = useState(null);
-        const [gameStarted, setGameStarted]  = useState(false);
         const navigate = useNavigate();
         const changePlayerCount = (players) => {
             setPlayerCount(Object.keys(players).length);
@@ -42,14 +42,40 @@
                     setMaxPlayers(lastJsonMessage.data);
                 }
                 else if (lastJsonMessage.type === 'checkGameStarted') {
-                    setGameStarted(lastJsonMessage.data);
                     // Handle the logic here after receiving the server response
                     if (lastJsonMessage.data) {
-                        navigate('/pregame');
+                        sendJsonMessage({
+                            type: 'requestTime',
+                            data: 'waiting'
+                        });
                     }
                 }
+                else if (lastJsonMessage.type === 'requestTime'){
+                    setTimer(lastJsonMessage.data);
+                    if (timer==-1){
+                        document.getElementsByClassName('waiting-message')[0].innerHTML = "Waiting for more players to join...";
+                    }
+                    else{
+                        document.getElementsByClassName('waiting-message')[0].innerHTML = "Game starting in "+timer;
+                    }
+                    if(timer===0){
+                        navigate('/pregame');
+                    }                   
+                }
             }
-        }, [lastJsonMessage]);
+        }, [lastJsonMessage,navigate,sendJsonMessage]);
+        //periodic request
+        useEffect(() => {
+            const timerInterval = setInterval(() => {
+              sendJsonMessage({
+                type: "requestTime",
+                data: "waiting",
+              });
+            }, 1000);
+            // Clear the interval when the component unmounts
+            return () => clearInterval(timerInterval);
+          }, [sendJsonMessage]);
+
         return(
             <div className="LobbyTable">
                 <img src={logo} className="App-logo-small" alt="logo" />

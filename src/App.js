@@ -3,6 +3,7 @@ import './App.css'
 import Login from './components/LoginComponent.js'
 import Lobby from './components/LobbyComponent.js'
 import RoleReveal from './components/RoleRevealComponent.js';
+import Game from './components/GameComponent.js';
 import {Routes,Route,Navigate,BrowserRouter} from 'react-router-dom'
 import useWebSocket,{ReadyState} from 'react-use-websocket';
 
@@ -42,6 +43,7 @@ function App() {
         <Route path='' element={<Navigate to ="/play" />} />
         <Route path='/waiting' element={<Lobby  />}/>
         <Route path='/pregame' element={<RoleReveal/>}></Route>
+        <Route path='/game' element={<Game/>}></Route>
         </Routes>
     </BrowserRouter>
   );
