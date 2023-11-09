@@ -4,57 +4,87 @@
     import useWebSocket from 'react-use-websocket';
     import {useNavigate} from 'react-router-dom';
 
-
-    // function addToTable(data){
-    //     document.getElementsByTagName('tbody').innerHTML= '';
-    //     var tr = document.createElement('tr');
-    //     var i=0
-    //     for (const key in data) {
-    //         tr.innerHTML='';
-    //         var td1 = document.createElement('td');
-    //         td1.innerHTML = i+1;
-    //         tr.appendChild(td1);
-    //         var td2 = document.createElement('td');
-    //         td2.innerHTML = data[key]['username'];
-    //         tr.appendChild(td2);
-    //         var td3 = document.createElement('td');
-    //         td3.innerHTML = data[key]['color'];
-    //         tr.appendChild(td3);
-    //         document.getElementsByTagName('tbody')[0].appendChild(tr);
-    //         console.log(tr);
-    //         tr = document.createElement('tr')
-    //         i++;
-    //     }
-    // }
-
     function Lobby(){
-        const { lastJsonMessage } = useWebSocket(wsurl, {
+        const { lastJsonMessage,sendJsonMessage } = useWebSocket(wsurl, {
             onOpen: () => {
                 console.log('Lobby: WebSocket connection established.');
             },
             share: true,
             filter: false
         });
+        const [timer,setTimer] = useState(3);
         const [tableData, setTableData] = useState([]);
+        const [playerCount, setPlayerCount] = useState(0);
+        const [maxPlayers, setMaxPlayers] = useState(null);
         const navigate = useNavigate();
+        const changePlayerCount = (players) => {
+            setPlayerCount(Object.keys(players).length);
+        };
 
+        useEffect(() => {
+            // Send a request for the variable from the server when the component mounts
+            sendJsonMessage({
+              type: 'checkMaxPlayers' // Define an appropriate message type
+            });
+          }, [sendJsonMessage]); // Remove sendJsonMessage from the dependency array
+          
         useEffect(() => {
             if(lastJsonMessage){
                 console.log("Client lobby: ",lastJsonMessage);
-                if (lastJsonMessage.type==='playerevent') {
+                if (lastJsonMessage.type==='playerEvent') {
                     setTableData(lastJsonMessage.data.players);
                     changePlayerCount(lastJsonMessage.data.players);
+                    sendJsonMessage({
+                        type: 'checkGameStarted'
+                    })
                 }
-                else if (lastJsonMessage.type==='startsignal'){
-
+                else if(lastJsonMessage.type==='checkMaxPlayers'){
+                    setMaxPlayers(lastJsonMessage.data);
+                }
+                else if (lastJsonMessage.type === 'checkGameStarted') {
+                    // Handle the logic here after receiving the server response
+                    if (lastJsonMessage.data) {
+                        sendJsonMessage({
+                            type: 'requestTime',
+                            data: 'waiting'
+                        });
+                    }
+                }
+                else if (lastJsonMessage.type === 'requestTime'){
+                    setTimer(lastJsonMessage.data);
+                    if (timer==-1){
+                        document.getElementsByClassName('waiting-message')[0].innerHTML = "Waiting for more players to join...";
+                    }
+                    else{
+                        document.getElementsByClassName('waiting-message')[0].innerHTML = "Game starting in "+timer;
+                    }
+                    if(timer===0){
+                        navigate('/pregame');
+                    }                   
                 }
             }
-        }, [lastJsonMessage]);
+        }, [lastJsonMessage,navigate,sendJsonMessage]);
+        //periodic request
+        useEffect(() => {
+            const timerInterval = setInterval(() => {
+              sendJsonMessage({
+                type: "requestTime",
+                data: "waiting",
+              });
+            }, 1000);
+            // Clear the interval when the component unmounts
+            return () => clearInterval(timerInterval);
+          }, [sendJsonMessage]);
+
         return(
             <div className="LobbyTable">
                 <img src={logo} className="App-logo-small" alt="logo" />
                 <br />
                 <div id='table-body'>
+                    <div className='message-container'>
+                        <p className='number-of-players-message'>Number of Players: {playerCount}/{maxPlayers}</p>
+                        <p className='waiting-message'>Waiting for more players to join...</p>
+                    </div>
                     <table className='table'>
                         <thead>
                             <tr>
