@@ -4,6 +4,7 @@ import Login from './components/LoginComponent.js'
 import Lobby from './components/LobbyComponent.js'
 import RoleReveal from './components/RoleRevealComponent.js';
 import Game from './components/GameComponent.js';
+import GameEnd from './components/EndComponent.js';
 import {Routes,Route,Navigate,BrowserRouter} from 'react-router-dom'
 import useWebSocket,{ReadyState} from 'react-use-websocket';
 
@@ -16,6 +17,7 @@ const wsurl = 'ws://127.0.0.1:8000';
 
 function App() {
   const [username, setUsername] = useState('');
+  const [winner,setWinner] = useState('');
   const { sendJsonMessage, readyState} = useWebSocket(wsurl, {
     onOpen: () => {
       console.log('App: WebSocket connection established.');
@@ -43,7 +45,8 @@ function App() {
         <Route path='' element={<Navigate to ="/play" />} />
         <Route path='/waiting' element={<Lobby  />}/>
         <Route path='/pregame' element={<RoleReveal/>}></Route>
-        <Route path='/game' element={<Game/>}></Route>
+        <Route path='/game' element={<Game afterEnd={setWinner}/>}></Route>
+        <Route path='/game-ended' element={<GameEnd winner={winner}/>}></Route>
         </Routes>
     </BrowserRouter>
   );

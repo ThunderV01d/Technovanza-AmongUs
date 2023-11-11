@@ -18,8 +18,7 @@ function Login({onLogin}){
     useEffect(() => {
         const error_msg = document.getElementsByClassName('error-message')[0];
         if (lastJsonMessage) {
-          if (lastJsonMessage.type === 'checkGameStarted') {
-            console.log("Game STARTED: ", lastJsonMessage.data);            
+          if (lastJsonMessage.type === 'lobbyFull') {
             // Handle the logic here after receiving the server response
             if (lastJsonMessage.data) {
               error_msg.innerHTML = "Lobby is full! Please join later.";
@@ -39,7 +38,7 @@ function Login({onLogin}){
           return;
         }
         sendJsonMessage({
-          type: 'checkGameStarted'
+          type: 'lobbyFull'
         });
         console.log("sent a check request!");
       };

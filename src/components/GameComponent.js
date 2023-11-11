@@ -4,52 +4,107 @@ import useWebSocket from "react-use-websocket";
 import { wsurl } from "../App";
 import { useNavigate } from "react-router";
 
-function Tasklist(){
+function TaskBox(){
     //define states
-    const [tasks, setTasks] = useState([
-        {id:1, title: 'Task 1', description: 'This is the description for Task 1.',checked: false},
-        {id:2, title: 'Task 2', description: 'This is the description for Task 2.',checked: false},
-      ]);
+    const [tasks, setTasks] = useState({});
+    
     //websocket connection
     const {sendJsonMessage,lastJsonMessage} = useWebSocket(wsurl,{
         share:true,
         filter:false,
     });
-    const handleCheckboxChange = (taskId) => {
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.id === taskId ? { ...task, checked: !task.checked } : task
-          
-        ));
-      };
-    const toggleDescription = (index) => {
-        const updatedTasks = tasks.map((task, i) => {
-          if (i === index) {
-            return { ...task, expanded: !task.expanded };
-          }
-          return task;
+    //requests
+    useEffect(() => {
+        sendJsonMessage({
+            type: 'taskEvent'
         });
-        setTasks(updatedTasks);
+    },[sendJsonMessage]);
+    //incoming
+    useEffect(() => {
+        if(lastJsonMessage){
+            if (lastJsonMessage.type==='taskEvent') {
+                setTasks(lastJsonMessage.data);
+            }
+        }
+    }, [lastJsonMessage]);
+
+    const handleCheckboxChange = (taskId) => {
+        setTasks((prevTasks) => {
+          console.log("Previous tasks:", prevTasks);
+          console.log("Received taskId:", taskId);
+      
+          if (prevTasks.hasOwnProperty(taskId)) {
+            console.log(`Toggling checked for task ${taskId}`);
+            if(prevTasks[taskId].expanded === true){
+              prevTasks[taskId].expanded=false;
+            }
+            const updatedTasks = {
+              ...prevTasks,
+              [taskId]: {
+                ...prevTasks[taskId],
+                checked: !prevTasks[taskId].checked,
+              },
+            };
+      
+            // Send the modified tasks to the server
+            const modifiedTasks = Object.fromEntries(
+              Object.entries(updatedTasks).map(([taskId, task]) => [
+                taskId,
+                {
+                  name: task.name,
+                  description: task.description,
+                  completed: task.checked?task.checked:false
+                },
+              ])
+            );
+      
+            sendJsonMessage({
+              type: 'taskEvent',
+              data: modifiedTasks ? modifiedTasks : '',
+            });
+      
+            return updatedTasks;
+          }
+      
+          console.log(`Task ${taskId} not found`);
+          return prevTasks;
+        });
+      };
+    const toggleDescription = (taskId) => {
+        setTasks((prevTasks) => {
+          const updatedTasks = { ...prevTasks }; // Create a shallow copy of the tasks object
+      
+          // Update the expanded property for the specific task
+          if (updatedTasks[taskId]) {
+            updatedTasks[taskId] = {
+              ...updatedTasks[taskId],
+              expanded: !updatedTasks[taskId].expanded,
+            };
+          }
+      
+          return updatedTasks;
+        });
     };
     return(
         <div className="task-box">
             <p id="task-header">Tasks:</p>
             <ul className="task-list">
-                {tasks.map((task,index) => (
-                    <li key={task.id} className={`task ${task.expanded ? 'expanded' : ''} ${task.checked ? 'disabled' : ''}`}
+                {Object.entries(tasks).map(([taskId,task]) => (
+                    <li key={taskId} className={`task ${task.expanded ? 'expanded' : ''} ${task.checked ? 'disabled' : ''}`}
                     style={{
                         color: task.checked ? '#666666' : 'rgb(0,0,0)',
                         pointerEvents: task.checked ? 'none' : 'auto',
                         
-                      }}>
+                      }}
+                    >
                     <span className="task-title">
-                        <div className="arrow-bullet" onClick={() => toggleDescription(index)}>
+                        <div className="arrow-bullet" onClick={() => toggleDescription(taskId)}>
                         {task.expanded ? '▼' : '▶'} {/* You can use your own arrow icons here */}
                         </div>
-                        {task.title}
+                        {task.name}
                         <div className='checkbox-container'>
-                            <input type="checkbox" id={`checkbox-${index}`} checked={task.checked} onChange={() => handleCheckboxChange(task.id)} disabled={task.checked}/>
-                            <label htmlFor={`checkbox-${index}`}></label>
+                            <input type="checkbox" id={`checkbox-${taskId}`} checked={task.checked} onChange={() => handleCheckboxChange(taskId)} disabled={task.checked}/>
+                            <label htmlFor={`checkbox-${taskId}`}></label>
                         </div>
                     </span>
                     <div className="description" style={{ display: task.expanded ? 'block' : 'none' }}>
@@ -62,8 +117,61 @@ function Tasklist(){
     )
 }
 
+function KillModal({closeModal}){
+  const {sendJsonMessage,lastJsonMessage} = useWebSocket(wsurl,{
+    share:true,
+    filter:false,
+  });
+  //define states
+  const [username,setUsername] = useState('');
+  const [players,setPlayers] = useState({
+    'client1':{username: 'player1'}, 
+    'client2':{username: 'player2'}, 
+  });
+  //requests
+  useEffect(() => {
+    sendJsonMessage({
+      type: 'requestUsername'
+    })
+    sendJsonMessage({
+      type: 'playerEvent'
+    });
+  },[sendJsonMessage]);
+   //message handling
+   useEffect(() => {
+    if(lastJsonMessage){
+        if(lastJsonMessage.type === 'requestUsername'){
+          setUsername(lastJsonMessage.data);
+        }
+        else if(lastJsonMessage.type === 'playerEvent'){
+          const players_obj = lastJsonMessage.data.players;
+          const filteredPlayers = Object.entries(players_obj).reduce((acc, [key, value]) => {
+            if (key !== 'username' || value !== username) {
+              acc[key] = value;
+            }
+            return acc;
+          }, {});
+          setPlayers(filteredPlayers);
+        }
+    }
+  }, [lastJsonMessage]);
+  return(
+    <div className="KillModal" onClick={closeModal}>
+      <div className="players-to-kill" onClick={(e) => e.stopPropagation()}>
+        <label htmlFor="player-to-kill">Select a player:</label><br/>
+        <select id="player-to-kill">
+          {Object.values(players).map((player, index) => (
+            <option key={index} value={player.username}>{player.username}</option>
+          ))}
+        </select><br/>
+        <button className="kill-button">Kill</button>
+      </div>
+    </div>
+  )
+}
 
-function Game(){
+
+function Game({afterEnd}){
     function secondsToMMSS(seconds) {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
@@ -76,45 +184,59 @@ function Game(){
     const navigate = useNavigate();
     //define states
     const [timer,setTimer] = useState(5);
+    const [killButtonEnabled,setKillButtonEnabled] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     //websocket connections
     const {sendJsonMessage,lastJsonMessage} = useWebSocket(wsurl,{
         share:true,
         filter:false,
     });
-    //request sending
+    // //request sending
     useEffect(() => {
-        sendJsonMessage({
-            type: 'requestTime',
-            data: 'game'
-        });
-    },[sendJsonMessage]);
+      sendJsonMessage({
+        type: 'requestRole'
+      });
+  },[sendJsonMessage]);
     //message handling
     useEffect(() => {
         if(lastJsonMessage){
-            if (lastJsonMessage.type === 'requestTime') {
-                setTimer(secondsToMMSS(lastJsonMessage.data));
-                if(lastJsonMessage.data===0){
-                    // navigate('/cum');
-                }
+            if (lastJsonMessage.type === 'broadcastTime') {
+              setTimer(secondsToMMSS(lastJsonMessage.data));
+            }
+            else if(lastJsonMessage.type === 'gameEnded'){
+              afterEnd && afterEnd(lastJsonMessage.data);
+              navigate('/game-ended');
+            }
+            else if(lastJsonMessage.type === 'requestRole'){
+              if(lastJsonMessage.data === 'imposter'){
+                setKillButtonEnabled(true);
+              }
             }
         }
     }, [lastJsonMessage,timer,navigate]);
-    //periodic request for time
-    useEffect(() => {
-        const timerInterval = setInterval(() => {
-          sendJsonMessage({
-            type: "requestTime",
-            data: "game",
-          });
-        }, 1000);
-        // Clear the interval when the component unmounts
-        return () => clearInterval(timerInterval);
-      }, [sendJsonMessage]);
+    //functions
+    const handleButtonClick = () => {
+      // if (killButtonEnabled) {
+        setIsModalOpen(true);
+      // }
+    };
+  
+    const closeModal = () => {
+      setIsModalOpen(false);
+    };
     //html
     return(
         <div className='Game'>
             <p className="game-timer">{timer}</p>
-            <Tasklist />
+            <TaskBox />
+            <div className='below-task-box'>
+              <p id="planet">🪐</p>
+              <button id='report-body-button'/>
+              <button id="spaceship" onClick={handleButtonClick} disabled={killButtonEnabled}>🚀</button>
+              {isModalOpen && (
+                <KillModal closeModal={closeModal}/>
+              )}
+            </div>
         </div>
     )
 }

@@ -18,18 +18,14 @@ function RoleReveal(){
         sendJsonMessage({
             type: 'requestRole'
         });
-        sendJsonMessage({
-            type: 'requestTime',
-            data: 'pregame'
-        });
     },[sendJsonMessage]);
-    //message handling
+    //incoming
     useEffect(() => {
         if(lastJsonMessage){
             if (lastJsonMessage.type==='requestRole') {
                 setRole(lastJsonMessage.data.toUpperCase());
             }
-            else if (lastJsonMessage.type === 'requestTime') {
+            else if (lastJsonMessage.type === 'broadcastTime') {
                 setTimer(lastJsonMessage.data);
                 if(timer===0){
                     navigate('/game');
@@ -37,17 +33,6 @@ function RoleReveal(){
             }
         }
     }, [lastJsonMessage,timer,role,navigate]);
-    //periodic request for time
-    useEffect(() => {
-        const timerInterval = setInterval(() => {
-          sendJsonMessage({
-            type: "requestTime",
-            data: "pregame",
-          });
-        }, 1000);
-        // Clear the interval when the component unmounts
-        return () => clearInterval(timerInterval);
-      }, [sendJsonMessage]);
 
     return(
         <div className="RoleReveal">
