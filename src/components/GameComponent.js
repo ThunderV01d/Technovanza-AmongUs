@@ -124,17 +124,15 @@ function KillModal({closeModal}){
   });
   //define states
   const [username,setUsername] = useState('');
-  const [players,setPlayers] = useState({
-    'client1':{username: 'player1'}, 
-    'client2':{username: 'player2'}, 
-  });
+  const [players,setPlayers] = useState({});
+  const [cooldown,setCooldown] = useState(0);
   //requests
   useEffect(() => {
     sendJsonMessage({
       type: 'requestUsername'
     })
     sendJsonMessage({
-      type: 'playerEvent'
+      type: 'requestAllPlayers'
     });
   },[sendJsonMessage]);
    //message handling
@@ -143,18 +141,38 @@ function KillModal({closeModal}){
         if(lastJsonMessage.type === 'requestUsername'){
           setUsername(lastJsonMessage.data);
         }
-        else if(lastJsonMessage.type === 'playerEvent'){
-          const players_obj = lastJsonMessage.data.players;
-          const filteredPlayers = Object.entries(players_obj).reduce((acc, [key, value]) => {
-            if (key !== 'username' || value !== username) {
-              acc[key] = value;
-            }
-            return acc;
-          }, {});
+        else if(lastJsonMessage.type === 'requestAllPlayers'){
+          const players_obj = lastJsonMessage.data;
+          const filteredPlayers =  Object.fromEntries(
+            Object.entries(players_obj).filter(([key, value]) => value.username !== username && value.alive)
+          );
           setPlayers(filteredPlayers);
         }
     }
   }, [lastJsonMessage]);
+  //function definitions
+  function killPlayer(){
+    const selectedPlayer = document.getElementById('player-to-kill').value;
+    if(cooldown===0){
+      sendJsonMessage({
+        type:"killPlayer",
+        data:selectedPlayer
+      })
+      sendJsonMessage({
+        type: 'requestAllPlayers',
+      });
+      setCooldown(3); // Set the cooldown to true
+      const intervalId = setInterval(() => {
+        setCooldown(prevCooldown => {
+          console.log("cooldown: ",prevCooldown);
+          if (prevCooldown === 1) {
+            clearInterval(intervalId); // Clear the interval when cooldown reaches 0
+          }
+          return prevCooldown-1;
+        }); // Update the cooldown every second
+      }, 1000);
+    }
+  }
   return(
     <div className="KillModal" onClick={closeModal}>
       <div className="players-to-kill" onClick={(e) => e.stopPropagation()}>
@@ -164,7 +182,8 @@ function KillModal({closeModal}){
             <option key={index} value={player.username}>{player.username}</option>
           ))}
         </select><br/>
-        <button className="kill-button">Kill</button>
+        <button className="kill-button" onClick={killPlayer}>Kill</button>
+        {cooldown>0 && <p id="cooldown-timer">Cooldown: {cooldown} seconds</p>}
       </div>
     </div>
   )
@@ -186,6 +205,8 @@ function Game({afterEnd}){
     const [timer,setTimer] = useState(5);
     const [killButtonEnabled,setKillButtonEnabled] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [playerDead,setPlayerDead] = useState(false);
+    const [myUsername, setMyUsername] = useState('');
     //websocket connections
     const {sendJsonMessage,lastJsonMessage} = useWebSocket(wsurl,{
         share:true,
@@ -196,6 +217,9 @@ function Game({afterEnd}){
       sendJsonMessage({
         type: 'requestRole'
       });
+      sendJsonMessage({
+        type: 'requestUsername'
+      })
   },[sendJsonMessage]);
     //message handling
     useEffect(() => {
@@ -212,13 +236,38 @@ function Game({afterEnd}){
                 setKillButtonEnabled(true);
               }
             }
+            else if(lastJsonMessage.type === 'killPlayer'){
+              setPlayerDead(true);
+            }
+            else if(lastJsonMessage.type === 'votePlayer'){
+              if(!lastJsonMessage.data){
+                navigate('/voting');
+              }
+            }
+            else if(lastJsonMessage.type === 'requestUsername'){
+              setMyUsername(lastJsonMessage.data);
+              sendJsonMessage({
+                type: 'requestAllPlayers'
+              });
+            }
+            else if(lastJsonMessage.type === 'requestAllPlayers'){
+              for(const player in lastJsonMessage.data){
+                if(lastJsonMessage.data[player].username === myUsername && lastJsonMessage.data[player].hasOwnProperty('alive') && !lastJsonMessage.data[player].alive){
+                  setPlayerDead(true);
+                }
+              }
+            }
         }
     }, [lastJsonMessage,timer,navigate]);
     //functions
+    const reportBody = () => {
+      sendJsonMessage({
+        type: 'votePlayer',
+        data: 'init'
+      })
+    }
     const handleButtonClick = () => {
-      // if (killButtonEnabled) {
-        setIsModalOpen(true);
-      // }
+      setIsModalOpen(true);
     };
   
     const closeModal = () => {
@@ -228,11 +277,11 @@ function Game({afterEnd}){
     return(
         <div className='Game'>
             <p className="game-timer">{timer}</p>
-            <TaskBox />
+            {playerDead?<p>YOU DIED!</p>:<TaskBox />}
             <div className='below-task-box'>
               <p id="planet">🪐</p>
-              <button id='report-body-button'/>
-              <button id="spaceship" onClick={handleButtonClick} disabled={killButtonEnabled}>🚀</button>
+              <button id='report-body-button' onClick={reportBody} disabled={playerDead}/>
+              <button id="spaceship" onClick={handleButtonClick} disabled={!killButtonEnabled}>🚀</button>
               {isModalOpen && (
                 <KillModal closeModal={closeModal}/>
               )}

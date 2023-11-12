@@ -14,7 +14,7 @@
   pointer-events: none;
 }
 
-.Game{
+.Game,.Voting{
   background-color: #0b0b0c;
   background-size: 100vmin;
   min-height: 100vh;
@@ -366,7 +366,10 @@ table tr:nth-child(odd){
   overflow: auto;
   font-family: monospace;
   font-size: 2vmin;
-  justify-items:center;
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Center children vertically */
+  align-items: center; /* Center children horizontally */
 }
 
 .players-to-kill label{
@@ -380,7 +383,27 @@ table tr:nth-child(odd){
   background: #ff0000;
   color: #fff;
   padding: 10px;
-  border: none;
+  border: solid 3px #6d0000;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 2vmax;
+}
+
+#cooldown-timer{
+  margin: 0px;
+  font-size: 2vmax;
+}
+
+.Voting h2{
+  text-align: center;
+}
+.Voting legend{
+  text-align: center;
+}
+
+.Voting button{
+  display: block;
+  position: relative;
+  margin: 30%;
+  font-size: 3vh;
 }
