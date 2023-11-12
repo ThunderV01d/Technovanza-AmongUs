@@ -14,7 +14,7 @@
   pointer-events: none;
 }
 
-.Game{
+.Game,.Voting{
   background-color: #0b0b0c;
   background-size: 100vmin;
   min-height: 100vh;
@@ -28,7 +28,7 @@
   overflow-y:auto;
 }
 
-.Login,.LobbyTable,.RoleReveal{
+.Login,.LobbyTable,.RoleReveal,.GameEnd{
   background-color: #1a1c20;
   background-image: url("wallpaper.gif");
   background-blend-mode:hard-light;
@@ -178,7 +178,8 @@ table tr:nth-child(odd){
 .game-timer{
   position: absolute;
   top: 0vh;
-  margin:10px;
+  margin:1.5vh;
+  font-size: 4vh;
   color:white
 }
 
@@ -290,4 +291,119 @@ table tr:nth-child(odd){
 
 .task-list .expanded .description {
   display: block;
+}
+
+.below-task-box{
+  position: absolute;
+  bottom: 10vh;
+  width: 100%;
+  height: 30%;
+  font-size: 10vh;
+  display: flex;
+  align-items: center;
+}
+
+#spaceship{
+  flex:1;
+  max-width: 40vh; /* Set a max-width to ensure it doesn't get too large */
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+#spaceship:disabled{
+  cursor:auto;
+}
+
+#report-body-button{
+  flex:2;
+  max-width: 80vh; /* Set a max-width to ensure it doesn't get too large */
+  height: 100%;
+  background: url('report.png') no-repeat center center;
+  background-size: contain; /* Ensure the image covers the button */
+  border: none; 
+  cursor: pointer;
+  object-fit: contain;
+}
+@media (min-width: 768px) {
+  #report-body-button {
+    margin-right: 10vw; /* Adjust the margin as needed */
+  }
+}
+#planet{
+  font-family: inherit;
+  font-size: inherit;
+  pointer-events: none;
+  flex: 1; /* Let it take all available space */
+}
+
+
+.KillModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.players-to-kill {
+  width: 50%;
+  height: 25%;
+  background: rgb(145, 28, 28);
+  border-style: solid;
+  border-color: rgb(86, 17, 17);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  overflow: auto;
+  font-family: monospace;
+  font-size: 2vmin;
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Center children vertically */
+  align-items: center; /* Center children horizontally */
+}
+
+.players-to-kill label{
+  font-size:3vmax;
+}
+.player-to-kill{
+  margin-bottom: 10px;
+}
+
+.kill-button {
+  background: #ff0000;
+  color: #fff;
+  padding: 10px;
+  border: solid 3px #6d0000;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 2vmax;
+}
+
+#cooldown-timer{
+  margin: 0px;
+  font-size: 2vmax;
+}
+
+.Voting h2{
+  text-align: center;
+}
+.Voting legend{
+  text-align: center;
+}
+
+.Voting button{
+  display: block;
+  position: relative;
+  margin: 30%;
+  font-size: 3vh;
 }
