@@ -148,6 +148,9 @@ function KillModal({closeModal}){
           );
           setPlayers(filteredPlayers);
         }
+        else if(lastJsonMessage.type === 'broadcastCooldown'){
+          setCooldown(lastJsonMessage.data);
+        }
     }
   }, [lastJsonMessage]);
   //function definitions
@@ -161,16 +164,6 @@ function KillModal({closeModal}){
       sendJsonMessage({
         type: 'requestAllPlayers',
       });
-      setCooldown(3); // Set the cooldown to true
-      const intervalId = setInterval(() => {
-        setCooldown(prevCooldown => {
-          console.log("cooldown: ",prevCooldown);
-          if (prevCooldown === 1) {
-            clearInterval(intervalId); // Clear the interval when cooldown reaches 0
-          }
-          return prevCooldown-1;
-        }); // Update the cooldown every second
-      }, 1000);
     }
   }
   return(
@@ -179,10 +172,10 @@ function KillModal({closeModal}){
         <label htmlFor="player-to-kill">Select a player:</label><br/>
         <select id="player-to-kill">
           {Object.values(players).map((player, index) => (
-            <option key={index} value={player.username}>{player.username}</option>
+            <option key={index} value={player.username}>{`${player.username} (${player.color})`}</option>
           ))}
         </select><br/>
-        <button className="kill-button" onClick={killPlayer}>Kill</button>
+        <button className="kill-button" onClick={killPlayer} disabled={cooldown>0}>Kill</button>
         {cooldown>0 && <p id="cooldown-timer">Cooldown: {cooldown} seconds</p>}
       </div>
     </div>
@@ -202,7 +195,7 @@ function Game({afterEnd}){
     }
     const navigate = useNavigate();
     //define states
-    const [timer,setTimer] = useState(5);
+    const [timer,setTimer] = useState("");
     const [killButtonEnabled,setKillButtonEnabled] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [playerDead,setPlayerDead] = useState(false);
@@ -257,6 +250,10 @@ function Game({afterEnd}){
                 }
               }
             }
+            else if(lastJsonMessage.type === 'endGame'){
+              afterEnd && afterEnd("NONE (GAME FORCE STOPPED)");
+              navigate('/game-ended');              
+            }
         }
     }, [lastJsonMessage,timer,navigate]);
     //functions
@@ -277,15 +274,15 @@ function Game({afterEnd}){
     return(
         <div className='Game'>
             <p className="game-timer">{timer}</p>
-            {playerDead?<p>YOU DIED!</p>:<TaskBox />}
-            <div className='below-task-box'>
+            {playerDead?<p className="you-died-message">YOU DIED!</p>:<TaskBox />}
+            {!playerDead?<div className='below-task-box'>
               <p id="planet">🪐</p>
-              <button id='report-body-button' onClick={reportBody} disabled={playerDead}/>
+              <button id='report-body-button' onClick={reportBody}/>
               <button id="spaceship" onClick={handleButtonClick} disabled={!killButtonEnabled}>🚀</button>
               {isModalOpen && (
                 <KillModal closeModal={closeModal}/>
               )}
-            </div>
+            </div>:<></>}
         </div>
     )
 }

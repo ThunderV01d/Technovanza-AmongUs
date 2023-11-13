@@ -15,17 +15,17 @@
 }
 
 .Game,.Voting{
-  background-color: #0b0b0c;
-  background-size: 100vmin;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(25px + 1vmin);
-  font-family:Verdana, Geneva, Tahoma, sans-serif;
-  color: rgb(172, 157, 157);
-  overflow-y:auto;
+    background-color: #0b0b0c;
+    background-size: 100vmin;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(25px + 1vmin);
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    color: rgb(172, 157, 157);
+    overflow-y:auto;
 }
 
 .Login,.LobbyTable,.RoleReveal,.GameEnd{
@@ -184,7 +184,7 @@ table tr:nth-child(odd){
 }
 
 .task-box{
-  background-color: rgb(222, 222, 126);
+  background-color: rgb(196, 196, 148);
   color:#0b0b0c;
   padding: 10px;
   border: 1px solid gray;
@@ -389,6 +389,12 @@ table tr:nth-child(odd){
   font-size: 2vmax;
 }
 
+.kill-button:disabled{
+  background: grey;
+  border-color: rgb(70, 70, 70);
+  cursor: auto;
+}
+
 #cooldown-timer{
   margin: 0px;
   font-size: 2vmax;
@@ -406,4 +412,22 @@ table tr:nth-child(odd){
   position: relative;
   margin: 30%;
   font-size: 3vh;
+}
+
+.you-died-message{
+  color:darkred;
+  font-family:monospace;
+  font-size: 10vw;
+}
+
+.game-ended-message{
+  color:darkred;
+  font-family:monospace;
+  font-size: 5vmax;
+}
+
+.who-won {
+  font-family:monospace;
+  color:rgb(208, 201, 146);
+  font-size: 3vmax;
 }

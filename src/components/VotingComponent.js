@@ -17,6 +17,8 @@ function Voting({afterEnd}){
     const [previouslySelectedPlayer, setPreviouslySelectedPlayer] = useState(null);
     const [resultOfVote, setResultOfVote] = useState("");
     const [myUsername,setMyUsername] = useState("");
+    const [players,setPlayers] = useState({});
+    const [timer,setTimer] = useState("");
     //requests
     useEffect(() => {
         sendJsonMessage({
@@ -25,6 +27,10 @@ function Voting({afterEnd}){
         sendJsonMessage({
             type: 'requestUsername'
         })
+        sendJsonMessage({
+            type: 'requestAllPlayers'
+        })
+        console.log("all initial requests done");
       },[sendJsonMessage]);    
     //message handling
     useEffect(() => {
@@ -54,51 +60,63 @@ function Voting({afterEnd}){
                 afterEnd && afterEnd(lastJsonMessage.data);
                 navigate('/game-ended');
             }
+            else if(lastJsonMessage.type === 'endGame'){
+                afterEnd && afterEnd("NONE (GAME FORCE STOPPED)");
+                navigate('/game-ended');              
+            }
+            else if(lastJsonMessage.type === 'broadcastTime'){
+                setTimer(secondsToMMSS(lastJsonMessage.data));
+            }
+            else if(lastJsonMessage.type === 'requestAllPlayers'){
+                setPlayers(lastJsonMessage.data);
+            }
         }
       }, [lastJsonMessage]);
     //functions
     const handleVoteChange = (player) => {
-        if (previouslySelectedPlayer) {
-            setVotes((prevVotes) => ({
-              ...prevVotes,
-              [previouslySelectedPlayer]: {
-                ...prevVotes[previouslySelectedPlayer],
-                votes: prevVotes[previouslySelectedPlayer].votes - 1,
-              },
-            }));
-        }
         setSelectedPlayer(player);
-        setVotes(prevVotes => ({
-          ...prevVotes,
-          [player]: {
-            ...prevVotes[player],
-            votes: prevVotes[player].votes + 1,
-          },
-        }));
-        setPreviouslySelectedPlayer(player);
     };
+    
     const submitVotes = () => {
-        //Send message to server to update votes
+        // Send final update to the server with "voted" set to true
         if (myUsername) {
+
             setVotes((prevVotes) => {
                 const updatedVotes = { ...prevVotes };
+                if (selectedPlayer) {
+                    updatedVotes[selectedPlayer] = {
+                        ...updatedVotes[selectedPlayer],
+                        votes: updatedVotes[selectedPlayer].votes + 1,
+                    };
+                }
+                else return;
                 updatedVotes[myUsername] = {
                     ...updatedVotes[myUsername],
                     voted: true,
                 };
-                console.log(updatedVotes); // Log the updatedVotes here
+                // Send final update to the server
                 sendJsonMessage({
-                    type:'votePlayer',
-                    data: updatedVotes
-                })
+                    type: 'votePlayer',
+                    data: updatedVotes,
+                });
                 return updatedVotes;
             });
         }
         setVoteSubmitted(true);
-    }; 
+    };     
+    function secondsToMMSS(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+      
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+      
+        return `${formattedMinutes}:${formattedSeconds}`;
+    }
     //markup
     return(
         <div className="Voting">
+            <p className="game-timer">{timer}</p>
             <h2>EMERGENCY MEETING</h2>
             <form>
                 <fieldset>
@@ -113,7 +131,9 @@ function Voting({afterEnd}){
                         onChange={() => handleVoteChange(player)}
                         disabled={voteSubmitted}
                         />
-                        <label>{`${player} (${data.votes})`}</label>
+                        <label>{`${player} (${
+                players && Object.values(players).find(p => p.username === player)?.color
+            })\t(${data.votes} votes)`}</label>
                     </div>
                     ))}
                     {/* Submit button */}
