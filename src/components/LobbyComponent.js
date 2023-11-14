@@ -32,8 +32,8 @@
             if(lastJsonMessage){
                 console.log("Client lobby: ",lastJsonMessage);
                 if (lastJsonMessage.type==='playerEvent') {
-                    setTableData(lastJsonMessage.data.players);
-                    changePlayerCount(lastJsonMessage.data.players);
+                    setTableData(lastJsonMessage.data);
+                    changePlayerCount(lastJsonMessage.data);
                 }
                 else if(lastJsonMessage.type==='checkMaxPlayers'){
                     setMaxPlayers(lastJsonMessage.data);

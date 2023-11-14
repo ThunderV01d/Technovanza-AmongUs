@@ -3,6 +3,7 @@ import { useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { wsurl } from "../App";
 import { useNavigate } from "react-router";
+import map from '../map.png'
 
 function TaskBox(){
     //define states
@@ -182,6 +183,15 @@ function KillModal({closeModal}){
   )
 }
 
+function MapModal({closeModal}){
+  return(
+    <div className="MapModal" onClick={closeModal}>
+      <img id="map" src={map} onClick={(e) => e.stopPropagation()}>
+
+      </img>
+    </div>
+  )
+}
 
 function Game({afterEnd}){
     function secondsToMMSS(seconds) {
@@ -197,7 +207,8 @@ function Game({afterEnd}){
     //define states
     const [timer,setTimer] = useState("");
     const [killButtonEnabled,setKillButtonEnabled] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isKillModalOpen, setIsKillModalOpen] = useState(false);
+    const [isMapModalOpen, setIsMapModalOpen] = useState(false);
     const [playerDead,setPlayerDead] = useState(false);
     const [myUsername, setMyUsername] = useState('');
     //websocket connections
@@ -232,10 +243,10 @@ function Game({afterEnd}){
             else if(lastJsonMessage.type === 'killPlayer'){
               setPlayerDead(true);
             }
-            else if(lastJsonMessage.type === 'votePlayer'){
-              if(!lastJsonMessage.data){
-                navigate('/voting');
-              }
+            else if(lastJsonMessage.type === 'allowVoting'){
+                if(!playerDead){
+                  navigate('/voting');
+                }
             }
             else if(lastJsonMessage.type === 'requestUsername'){
               setMyUsername(lastJsonMessage.data);
@@ -257,18 +268,17 @@ function Game({afterEnd}){
         }
     }, [lastJsonMessage,timer,navigate]);
     //functions
-    const reportBody = () => {
-      sendJsonMessage({
-        type: 'votePlayer',
-        data: 'init'
-      })
-    }
-    const handleButtonClick = () => {
-      setIsModalOpen(true);
+    const openKillModal = () => {
+      setIsKillModalOpen(true);
     };
-  
-    const closeModal = () => {
-      setIsModalOpen(false);
+    const closeKillModal = () => {
+      setIsKillModalOpen(false);
+    };
+    const openMapModal = () => {
+      setIsMapModalOpen(true);
+    };
+    const closeMapModal = () => {
+      setIsMapModalOpen(false);
     };
     //html
     return(
@@ -277,10 +287,13 @@ function Game({afterEnd}){
             {playerDead?<p className="you-died-message">YOU DIED!</p>:<TaskBox />}
             {!playerDead?<div className='below-task-box'>
               <p id="planet">🪐</p>
-              <button id='report-body-button' onClick={reportBody}/>
-              <button id="spaceship" onClick={handleButtonClick} disabled={!killButtonEnabled}>🚀</button>
-              {isModalOpen && (
-                <KillModal closeModal={closeModal}/>
+              <button id='map_icon' onClick={openMapModal}/>
+              <button id="spaceship" onClick={openKillModal} disabled={!killButtonEnabled}>🚀</button>
+              {isKillModalOpen && (
+                <KillModal closeModal={closeKillModal}/>
+              )}
+              {isMapModalOpen && (
+                <MapModal closeModal={closeMapModal}/>
               )}
             </div>:<></>}
         </div>

@@ -12,11 +12,6 @@ import Voting from './components/VotingComponent.js';
 // const wsurl = 'ws://127.0.0.1:8000';
 const wsurl = 'wss://among-us-web-socket-server.glitch.me/';
 
-// function isPlayerEvent(message){
-//   let evt = JSON.parse(message.data);
-//   return evt.type === 'playerEvent';
-// }
-
 function App() {
   const [username, setUsername] = useState('');
   const [winner,setWinner] = useState('');
