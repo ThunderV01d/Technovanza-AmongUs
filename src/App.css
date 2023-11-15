@@ -387,7 +387,7 @@ table tr:nth-child(odd){
 }
 
 #map{
-  min-width: 75%;
+  width: 100%;
 }
 
 .players-to-kill label{
